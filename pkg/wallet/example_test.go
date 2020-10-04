@@ -1,9 +1,6 @@
 package wallet
 
 import (
-	"github.com/google/uuid"
-	//"errors"
-	"github.com/s-zer0/wallet/pkg/types"
 	"testing"
 )
 
@@ -17,7 +14,7 @@ func TestService_RegisterAccount_success(t *testing.T) {
 	}
 }
 
-func TestService_FindAccoundByIDmethod_notFound(t *testing.T) {
+func TestService_FindAccoundByID_notFound(t *testing.T) {
 	svc := Service{}
 	svc.RegisterAccount("+9920000001")
 
