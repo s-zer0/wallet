@@ -1,6 +1,8 @@
 package wallet
 
 import (
+	"reflect"
+	"fmt"
 	"testing"
 	"github.com/s-zer0/wallet/pkg/types"
 )
@@ -51,5 +53,33 @@ func TestService_Reject_success(t *testing.T) {
 	if err != nil {
 		t.Errorf("Reject(): error = %v", err)
 		return
+	}
+}
+
+func TestService_FindPaymentByID_success(t *testing.T) {
+	svc := &Service{}
+	svc.RegisterAccount("+9920000001")
+
+	payment, err := svc.Pay(2, types.Money(110), "auto")
+
+	if err != nil {
+		switch err {
+			case ErrAmountMustBePositive:
+				fmt.Println("Сумма должна быть положительной")
+			case ErrAccountNotFound:
+				fmt.Println("Аккаунт пользователя не найден")
+			case ErrNotEnoughBalance:
+				fmt.Println("Недостаточно средств на балансе")
+			}
+			return 
+	}
+
+	result, err := svc.FindPaymentByID(payment.ID)
+	if err != nil{
+		fmt.Println("Платёж не найден")
+	}
+
+	if !reflect.DeepEqual(payment, result) {
+		t.Errorf("invalid result, expected: %v, actual: %v", payment, result)
 	}
 }
