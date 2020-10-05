@@ -56,7 +56,7 @@ func TestService_Reject_success(t *testing.T) {
 	}
 }
 
-func TestService_FindPaymentByID_success(t *testing.T) {
+func TestService_FindPaymentByID_Success(t *testing.T) {
 	svc := &Service{}
 	svc.RegisterAccount("+9920000001")
 
