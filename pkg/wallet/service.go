@@ -135,7 +135,7 @@ func (s *Service) FindPaymentByID(paymentID string) (*types.Payment, error) {
 	var payment *types.Payment
 	for _, pay := range s.payments {
 		if pay.ID == paymentID {
-			payment.ID = paymentID
+			payment = pay
 			break
 		}
 	}
