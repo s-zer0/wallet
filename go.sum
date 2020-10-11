@@ -1,4 +1,2 @@
 github.com/google/uuid v1.1.2 h1:EVhdT+1Kseyi1/pUmXKaFxYsDNy9RQYkMWRH68J/W7Y=
 github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/s-zer0/wallet v1.2.0 h1:NrfXEeL4JC/K2fWs6Vl/prZxaFgkfgQOONjM7pHCJgc=
-github.com/s-zer0/wallet v1.2.0/go.mod h1:dJ9YS3lWyRSr0xlqrrsyOajxZMdSE8F+/UlLeo2Qxmo=
