@@ -52,13 +52,19 @@ func (s *Service) Deposit(accountID int64, amount types.Money) error {
 	if amount <= 0 {
 		return ErrAmountMustBePositive
 	}
+	var account *types.Account
+	for _, acc := range s.accounts {
+		if acc.ID == accountID {
+			account = acc
+			break
+		}
+	}
 
-	account, err := s.FindAccountByID(accountID)
-	if err != nil {
+	if account == nil {
 		return ErrAccountNotFound
 	}
 
-	// зачисление средств пока не рассматриваем как платёж
+	// зачисление средств пока не рассматриваем как платёж.
 	account.Balance += amount
 	return nil
 }
