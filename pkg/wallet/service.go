@@ -2,11 +2,12 @@ package wallet
 
 import (
 	"errors"
-	"github.com/s-zer0/wallet/pkg/types"
+
 	"github.com/google/uuid"
+	"github.com/s-zer0/wallet/pkg/types"
 )
 
-var ErrPhoneRegistered = errors.New("phone already registered")
+var ErrPhoneRegistred = errors.New("phone already registred")
 var ErrAmountMustBePositive = errors.New("amount must be greater than zero")
 var ErrAccountNotFound = errors.New("account not found")
 var ErrNotEnoughBalance = errors.New("not enough balance")
@@ -23,10 +24,9 @@ type Service struct {
 func (s *Service) RegisterAccount(phone types.Phone) (*types.Account, error) {
 	for _, account := range s.accounts {
 		if account.Phone == phone {
-			return nil, ErrPhoneRegistered
+			return nil, ErrPhoneRegistred
 		}
 	}
-
 	s.nextAccountID++
 	account := &types.Account{
 		ID:      s.nextAccountID,
@@ -36,16 +36,6 @@ func (s *Service) RegisterAccount(phone types.Phone) (*types.Account, error) {
 	s.accounts = append(s.accounts, account)
 
 	return account, nil
-}
-
-func (s *Service) FindAccountByID(accountID int64) (*types.Account, error) {
-	for _, account := range s.accounts {
-		if account.ID == accountID {
-			return account, nil
-		}
-	}
-
-	return nil, ErrAccountNotFound
 }
 
 func (s *Service) Deposit(accountID int64, amount types.Money) error {
@@ -73,7 +63,6 @@ func (s *Service) Pay(accountID int64, amount types.Money, category types.Paymen
 	if amount <= 0 {
 		return nil, ErrAmountMustBePositive
 	}
-
 	var account *types.Account
 	for _, acc := range s.accounts {
 		if acc.ID == accountID {
@@ -84,7 +73,6 @@ func (s *Service) Pay(accountID int64, amount types.Money, category types.Paymen
 	if account == nil {
 		return nil, ErrAccountNotFound
 	}
-
 	if account.Balance < amount {
 		return nil, ErrNotEnoughBalance
 	}
@@ -98,8 +86,51 @@ func (s *Service) Pay(accountID int64, amount types.Money, category types.Paymen
 		Category:  category,
 		Status:    types.PaymentStatusInProgress,
 	}
+
 	s.payments = append(s.payments, payment)
 	return payment, nil
+}
+
+func (s *Service) FindAccountByID(accountID int64) (*types.Account, error) {
+	var account *types.Account
+	for _, acc := range s.accounts {
+		if acc.ID == accountID {
+			account = acc
+			break
+		}
+	}
+	if account == nil {
+		return nil, ErrAccountNotFound
+	}
+	return account, nil
+}
+
+func (s *Service) Reject(paymentID string) error {
+	var targetPaymet *types.Payment
+	for _, payment := range s.payments {
+		if payment.ID == paymentID {
+			targetPaymet = payment
+			break
+		}
+	}
+	if targetPaymet == nil {
+		return ErrPaymentNotFound
+	}
+
+	var targetAccount *types.Account
+	for _, account := range s.accounts {
+		if account.ID == targetPaymet.AccountID {
+			targetAccount = account
+			break
+		}
+	}
+	if targetAccount == nil {
+		return ErrAccountNotFound
+	}
+
+	targetPaymet.Status = types.PaymentStatusFail
+	targetAccount.Balance += targetPaymet.Amount
+	return nil
 }
 
 func (s *Service) FindPaymentByID(paymentID string) (*types.Payment, error) {
@@ -108,37 +139,26 @@ func (s *Service) FindPaymentByID(paymentID string) (*types.Payment, error) {
 			return payment, nil
 		}
 	}
-
 	return nil, ErrPaymentNotFound
 }
 
-func (s *Service) Reject(paymentID string) error {
-	payment, err := s.FindPaymentByID(paymentID)
-	if err != nil {
-		return err
-	}
-	account, err := s.FindAccountByID(payment.AccountID)
-	if err == nil {
-		return err
-	}
-
-	payment.Status = types.PaymentStatusFail
-	account.Balance += payment.Amount
-	return nil
-}
-
 func (s *Service) Repeat(paymentID string) (*types.Payment, error) {
-	payment, err := s.FindPaymentByID(paymentID)
-	if err != nil {
-		return nil, err
-	}
+	var targetpayment *types.Payment
+		for _, payment := range s.payments{
+			if payment.ID == paymentID {
+				targetpayment=payment
+			}
+		}
+		if targetpayment ==nil {
+			return nil, ErrAccountNotFound
+		}
 
-	pay, err:= s.Pay(payment.AccountID, payment.Amount, payment.Category)
-	if err != nil {
-		return nil, err
-	}
-	
-	return pay, nil
+		pay,err:=s.Pay(targetpayment.AccountID,targetpayment.Amount,targetpayment.Category)
+		if err!=nil {
+			return nil,err
+		}
+		
+		return pay,nil
 }
 
 func (s *Service) FavoritePayment(paymentID string, name string) (*types.Favorite, error) {
