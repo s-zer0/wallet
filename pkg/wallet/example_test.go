@@ -16,6 +16,16 @@ func TestService_RegisterAccount_success(t *testing.T) {
 	}
 }
 
+func TestService_RegisterAccount_fail(t *testing.T) {
+	s := &Service{}
+	phone := types.Phone("+9920000001")
+	s.RegisterAccount(phone)
+	s.RegisterAccount(phone)
+	account, err := s.FindAccountByID(1)
+	if err != nil {
+		t.Errorf("\ngot > %v \nwant > nil", account)
+	}
+}
 func TestService_FindAccoundByIdmethod_notFound(t *testing.T) {
 	s := &Service{}
 	phone := types.Phone("+9920000001")
