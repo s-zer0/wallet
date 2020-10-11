@@ -127,7 +127,12 @@ func (s *Service) Repeat(paymentID string) (*types.Payment, error) {
 		return nil, err
 	}
 
-	return s.Pay(payment.AccountID, payment.Amount, payment.Category)
+	pay, err:= s.Pay(payment.AccountID, payment.Amount, payment.Category)
+	if err != nil {
+		return nil, err
+	}
+	
+	return pay, nil
 }
 
 func (s *Service) FavoritePayment(paymentID string, name string) (*types.Favorite, error) {
