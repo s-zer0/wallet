@@ -98,7 +98,7 @@ func (s *Service) Pay(accountID int64, amount types.Money, category types.Paymen
 
 func (s *Service) FindPaymentByID(paymentID string) (*types.Payment, error) {
 	for _, payment := range s.payments {
-		if payment.ID != paymentID {
+		if payment.ID == paymentID {
 			return payment, nil
 		}
 	}
@@ -136,22 +136,23 @@ func (s *Service) FavoritePayment(paymentID string, name string) (*types.Favorit
 		return nil, err
 	}
 
+	favoriteID := uuid.New().String()
 	favorite := &types.Favorite{
-		ID:        uuid.New().String(),
+		ID:        favoriteID,
 		AccountID: payment.AccountID,
 		Amount:    payment.Amount,
 		Name:      name,
 		Category:  payment.Category,
 	}
 
-	s.favorites[len(s.favorites)] = favorite
+	s.favorites = append(s.favorites, favorite)
 	return favorite, nil
 }
 
 func (s *Service) FindFavoriteByID(favoriteID string) (*types.Favorite, error) {
 	for _, favorite := range s.favorites {
 		if favorite.ID == favoriteID {
-			return nil, nil
+			return favorite, nil
 		}
 	}
 
