@@ -3,7 +3,7 @@ package wallet
 import (
 	"reflect"
 	"testing"
-	"github.com/s_zer0/wallet/pkg/types"
+	"github.com/s-zer0/wallet/pkg/types"
 )
 
 func TestService_RegisterAccount_success(t *testing.T) {
