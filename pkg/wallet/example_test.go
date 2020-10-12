@@ -6,7 +6,7 @@ import (
 	"github.com/s-zer0/wallet/pkg/types"
 )
 
-func TestService_RegisterAccount_success(t *testing.T) {
+func TestService_RegisterAccount_Success(t *testing.T) {
 	svc := Service{}
 	svc.RegisterAccount("+9920000001")
 
@@ -16,7 +16,7 @@ func TestService_RegisterAccount_success(t *testing.T) {
 	}
 }
 
-func TestService_FindAccoundByID_notFound(t *testing.T) {
+func TestService_FindAccoundByID_NotFound(t *testing.T) {
 	svc := Service{}
 	svc.RegisterAccount("+9920000001")
 
@@ -27,7 +27,7 @@ func TestService_FindAccoundByID_notFound(t *testing.T) {
 
 }
 
-func TestService_Reject_success(t *testing.T) {
+func TestService_Reject_Success(t *testing.T) {
 	s := &Service{}
 	phone := types.Phone("+9920000001")
 	account, err := s.RegisterAccount(phone)
@@ -55,7 +55,7 @@ func TestService_Reject_success(t *testing.T) {
 	}
 }
 
-func TestService_FindPaymentByID_success(t *testing.T) {
+func TestService_FindPaymentByID_Success(t *testing.T) {
 	//создаём сервис
 	s := &Service{}
 	
