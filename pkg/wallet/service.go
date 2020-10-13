@@ -265,7 +265,7 @@ func (s *Service) ImportFromFile(path string) error {
 	}
 
 	data := strings.Split(string(content), "|")
-	
+	data = data[:len(data)-1]
 	for _, dt := range data {
 		splits := strings.Split(dt, ";")
 
