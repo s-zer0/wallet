@@ -2,7 +2,9 @@ package wallet
 
 import (
 	"errors"
-
+	"os"
+	"log"
+	"strconv"
 	"github.com/google/uuid"
 	"github.com/s-zer0/wallet/pkg/types"
 )
@@ -13,6 +15,7 @@ var ErrAccountNotFound = errors.New("account not found")
 var ErrNotEnoughBalance = errors.New("not enough balance")
 var ErrPaymentNotFound = errors.New("payment not found")
 var ErrFavoriteNotFound = errors.New("favorite not found")
+var ErrFileNotFound = errors.New("file not found")
 
 type Service struct {
 	nextAccountID int64
@@ -201,4 +204,32 @@ func (s *Service) PayFromFavorite(favoriteID string) (*types.Payment, error) {
 		return nil, err
 	}
 	return payment, nil
+}
+
+func (s *Service) ExportToFile(path string) error {
+	file, err := os.Create(path)
+	if err != nil {
+		log.Print(err)
+		return ErrFileNotFound
+	}
+	defer func() {
+		if ferr := file.Close(); ferr != nil {
+			log.Print(ferr)
+		}
+	}()
+
+	str := ""
+
+	for _, data := range s.accounts {
+			str += strconv.Itoa(int(data.ID)) + ";"
+			str += string(data.Phone) + ";"
+			str += strconv.Itoa(int(data.Balance)) + "|"
+	}
+	
+	_, err = file.Write([]byte(str))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
