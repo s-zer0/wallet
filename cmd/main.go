@@ -8,4 +8,5 @@ func main() {
 	s.RegisterAccount("+992000000002")
 	s.RegisterAccount("+992000000003")
 	s.ExportToFile("data/export.txt")
+	s.ImportFromFile("data/import.txt")
 }
