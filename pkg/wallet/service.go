@@ -5,6 +5,8 @@ import (
 	"os"
 	"log"
 	"strconv"
+	"strings"
+	"io"
 	"github.com/google/uuid"
 	"github.com/s-zer0/wallet/pkg/types"
 )
@@ -231,5 +233,59 @@ func (s *Service) ExportToFile(path string) error {
 		return err
 	}
 
+	return nil
+}
+
+func (s *Service) ImportFromFile(path string) error {
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if ferr := file.Close(); ferr != nil {
+			return
+		}
+	}()
+
+	content := make([]byte, 0)
+	buf := make([]byte, 4)
+
+	for {
+		read, err := file.Read(buf)
+		if err == io.EOF {
+			content = append(content, buf[:read]...)
+			break
+		}
+		if err != nil {
+			log.Print(err)
+			return ErrFileNotFound
+		}
+
+		content = append(content, buf[:read]...)
+	}
+
+	data := strings.Split(string(content), "|")
+	
+	for _, dt := range data {
+		splits := strings.Split(dt, ";")
+
+		id, err := strconv.Atoi(splits[0])
+		if err != nil {
+			return err
+		}
+
+		balance, err := strconv.Atoi(splits[2])
+		if err != nil {
+			return err
+		}
+
+		account := &types.Account{
+			ID:      int64(id),
+			Phone:   types.Phone(splits[1]),
+			Balance: types.Money(balance),
+		}
+
+		s.accounts = append(s.accounts, account)
+	}
 	return nil
 }
