@@ -9,6 +9,7 @@ import (
 	"io"
 	"github.com/google/uuid"
 	"github.com/s-zer0/wallet/pkg/types"
+	"fmt"
 )
 
 var ErrPhoneRegistred = errors.New("phone already registred")
@@ -18,6 +19,7 @@ var ErrNotEnoughBalance = errors.New("not enough balance")
 var ErrPaymentNotFound = errors.New("payment not found")
 var ErrFavoriteNotFound = errors.New("favorite not found")
 var ErrFileNotFound = errors.New("file not found")
+var err error
 
 type Service struct {
 	nextAccountID int64
@@ -287,5 +289,65 @@ func (s *Service) ImportFromFile(path string) error {
 
 		s.accounts = append(s.accounts, account)
 	}
+	return nil
+}
+
+func (s *Service) Export(dir string) error {
+	if len(s.accounts) > 0 {
+		file, err := os.OpenFile("../../"+dir+"/accounts.dump", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+
+		defer func() {
+			if ferr := file.Close(); ferr != nil {
+				if err != nil {
+					err = ferr
+					log.Print(err)
+				}
+			}
+		}()
+
+		data := ""
+		for _, acc := range s.accounts {
+			data += fmt.Sprint(acc.ID) + ";" + string(acc.Phone) + ";" + fmt.Sprint(acc.Balance) + "\n"
+		}
+		file.WriteString(data)
+	}
+	if len(s.payments) > 0 {
+		file, _ := os.OpenFile("../../"+dir+"/payments.dump", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+
+		defer func() {
+			if ferr := file.Close(); ferr != nil {
+				if err != nil {
+					err = ferr
+					log.Print(err)
+				}
+			}
+		}()
+
+		data := ""
+		for _, pay := range s.payments {
+			data += fmt.Sprint(pay.ID) + ";" + fmt.Sprint(pay.AccountID) + ";" + fmt.Sprint(pay.Amount) + ";" + fmt.Sprint(pay.Category) + ";" + fmt.Sprint(pay.Status) + "\n"
+		}
+		file.WriteString(data)
+	}
+
+	if len(s.favorites) > 0 {
+		file, _ := os.OpenFile("../../"+dir+"/favorites.dump", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+
+		defer func() {
+			if ferr := file.Close(); ferr != nil {
+				if err != nil {
+					err = ferr
+					log.Print(err)
+				}
+			}
+		}()
+
+		data := ""
+		for _, fav := range s.favorites {
+			data += fmt.Sprint(fav.ID) + ";" + fmt.Sprint(fav.AccountID) + ";" + fmt.Sprint(fav.Amount) + ";" + fmt.Sprint(fav.Category) + "\n"
+		}
+		file.WriteString(data)
+	}
+
 	return nil
 }

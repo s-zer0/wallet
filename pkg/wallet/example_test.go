@@ -153,3 +153,17 @@ func TestService_Favorite_Success(t *testing.T) {
 		t.Errorf("Error() can't for an favorite(%v): %v", paymentFavorite, err)
 	}
 }
+
+func TestService_Export_success(t *testing.T) {
+	s := &Service{}
+
+	s.RegisterAccount("+992000000001")
+	s.RegisterAccount("+992000000002")
+	s.RegisterAccount("+992000000003")
+	s.RegisterAccount("+992000000004")
+
+	err := s.Export("data")
+	if err != nil {
+		t.Errorf("not nil error, err => %v", err)
+	}
+}
