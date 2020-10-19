@@ -166,4 +166,10 @@ func TestService_Export_success(t *testing.T) {
 	if err != nil {
 		t.Errorf("not nil error, err => %v", err)
 	}
+
+	err = s.Import("data")
+	if err != nil {
+		t.Errorf("not nil error, err => %v", err)
+	}
+
 }
