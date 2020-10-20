@@ -197,6 +197,38 @@ func TestService_Export_success(t *testing.T) {
 
 }
 
+func TestService_ExportHistory_success_user(t *testing.T) {
+	s := &Service{}
+
+	acc, err := s.RegisterAccount("+992000000001")
+
+	if err != nil {
+		t.Errorf("method RegisterAccount returned not nil error, account => %v", acc)
+	}
+
+	err = s.Deposit(acc.ID, 100_00)
+	if err != nil {
+		t.Errorf("not nil error, error => %v", err)
+	}
+
+	_, err = s.Pay(acc.ID, 1, "Cafe")
+	_, err = s.Pay(acc.ID, 2, "Auto")
+	_, err = s.Pay(acc.ID, 3, "Shoping")
+	if err != nil {
+		t.Errorf("not nil error, err => %v", err)
+	}
+
+	payments, err := s.ExportAccountHistory(acc.ID)
+	if err != nil {
+		t.Errorf("not nil error, err => %v", err)
+	}
+
+	err = s.HistoryToFiles(payments, "../../data", 2)
+	if err != nil {
+		t.Errorf("not nil error, err => %v", err)
+	}
+}
+
 func BenchmarkSumPayment_z(b *testing.B) {
 	s := &Service{}
 
