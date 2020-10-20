@@ -295,70 +295,71 @@ func (s *Service) ImportFromFile(path string) error {
 
 func (s *Service) Export(dir string) error {
 	if len(s.accounts) > 0 {
-		file, err := os.OpenFile("../../"+dir+"/accounts.dump", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+		file, err := os.OpenFile(dir+"/accounts.dump", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
 
 		defer func() {
-			if ferr := file.Close(); ferr != nil {
+			if cerr := file.Close(); cerr != nil {
 				if err != nil {
-					err = ferr
+					err = cerr
 					log.Print(err)
 				}
 			}
 		}()
 
-		data := ""
-		for _, acc := range s.accounts {
-			data += fmt.Sprint(acc.ID) + ";" + string(acc.Phone) + ";" + fmt.Sprint(acc.Balance) + "\n"
+		str := ""
+		for _, v := range s.accounts {
+			str += fmt.Sprint(v.ID) + ";" + string(v.Phone) + ";" + fmt.Sprint(v.Balance) + "\n"
 		}
-		file.WriteString(data)
+		file.WriteString(str)
 	}
 	if len(s.payments) > 0 {
-		file, _ := os.OpenFile("../../"+dir+"/payments.dump", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+		file, err := os.OpenFile(dir+"/payments.dump", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
 
 		defer func() {
-			if ferr := file.Close(); ferr != nil {
+			if cerr := file.Close(); cerr != nil {
 				if err != nil {
-					err = ferr
+					err = cerr
 					log.Print(err)
 				}
 			}
 		}()
 
-		data := ""
-		for _, pay := range s.payments {
-			data += fmt.Sprint(pay.ID) + ";" + fmt.Sprint(pay.AccountID) + ";" + fmt.Sprint(pay.Amount) + ";" + fmt.Sprint(pay.Category) + ";" + fmt.Sprint(pay.Status) + "\n"
+		str := ""
+		for _, v := range s.payments {
+			str += fmt.Sprint(v.ID) + ";" + fmt.Sprint(v.AccountID) + ";" + fmt.Sprint(v.Amount) + ";" + fmt.Sprint(v.Category) + ";" + fmt.Sprint(v.Status) + "\n"
 		}
-		file.WriteString(data)
+		file.WriteString(str)
 	}
 
 	if len(s.favorites) > 0 {
-		file, _ := os.OpenFile("../../"+dir+"/favorites.dump", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+		file, err := os.OpenFile(dir+"/favorites.dump", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
 
 		defer func() {
-			if ferr := file.Close(); ferr != nil {
+			if cerr := file.Close(); cerr != nil {
 				if err != nil {
-					err = ferr
+					err = cerr
 					log.Print(err)
 				}
 			}
 		}()
 
-		data := ""
-		for _, fav := range s.favorites {
-			data += fmt.Sprint(fav.ID) + ";" + fmt.Sprint(fav.AccountID) + ";" + fmt.Sprint(fav.Amount) + ";" + fmt.Sprint(fav.Category) + "\n"
+		str := ""
+		for _, v := range s.favorites {
+			str += fmt.Sprint(v.ID) + ";" + fmt.Sprint(v.AccountID) + ";" + fmt.Sprint(v.Amount) + ";" + fmt.Sprint(v.Category) + "\n"
 		}
-		file.WriteString(data)
+		file.WriteString(str)
 	}
 
 	return nil
 }
 
+//Import method
 func (s *Service) Import(dir string) error {
 
-	_, err := os.Stat("../../" + dir + "/accounts.dump")
+	_, err := os.Stat(dir + "/accounts.dump")
 
 	if err == nil {
-		content, err := ioutil.ReadFile("../../" + dir + "/accounts.dump")
+		content, err := ioutil.ReadFile(dir + "/accounts.dump")
 		if err != nil {
 			return err
 		}
@@ -398,10 +399,10 @@ func (s *Service) Import(dir string) error {
 		}
 	}
 
-	_, err1 := os.Stat("../../" + dir + "/payments.dump")
+	_, err1 := os.Stat(dir + "/payments.dump")
 
 	if err1 == nil {
-		content, err := ioutil.ReadFile("../../" + dir + "/payments.dump")
+		content, err := ioutil.ReadFile(dir + "/payments.dump")
 		if err != nil {
 			return err
 		}
@@ -449,10 +450,10 @@ func (s *Service) Import(dir string) error {
 		}
 	}
 
-	_, err2 := os.Stat("../../" + dir + "/favorites.dump")
+	_, err2 := os.Stat(dir + "/favorites.dump")
 
 	if err2 == nil {
-		content, err := ioutil.ReadFile("../../" + dir + "/favorites.dump")
+		content, err := ioutil.ReadFile(dir + "/favorites.dump")
 		if err != nil {
 			return err
 		}
