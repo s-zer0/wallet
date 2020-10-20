@@ -173,3 +173,41 @@ func TestService_Export_success(t *testing.T) {
 	}
 
 }
+
+func BenchmarkSumPayment_z(b *testing.B) {
+	s := &Service{}
+
+	account, err := s.RegisterAccount("+992000000001")
+
+	if err != nil {
+		b.Errorf("not nil error, account => %v", account)
+	}
+
+	err = s.Deposit(account.ID, 100_00)
+	if err != nil {
+		b.Errorf("not nil error, error => %v", err)
+	}
+
+	_, err = s.Pay(account.ID, 1, "Cafe")
+	_, err = s.Pay(account.ID, 2, "Cafe")
+	_, err = s.Pay(account.ID, 3, "Cafe")
+	_, err = s.Pay(account.ID, 4, "Cafe")
+	_, err = s.Pay(account.ID, 5, "Cafe")
+	_, err = s.Pay(account.ID, 6, "Cafe")
+	_, err = s.Pay(account.ID, 7, "Cafe")
+	_, err = s.Pay(account.ID, 8, "Cafe")
+	_, err = s.Pay(account.ID, 9, "Cafe")
+	_, err = s.Pay(account.ID, 10, "Cafe")
+	_, err = s.Pay(account.ID, 11, "Cafe")
+	if err != nil {
+		b.Errorf("not nil error, err => %v", err)
+	}
+
+	want := types.Money(66)
+
+	got := s.SumPayments(2)
+	if want != got {
+		b.Errorf(" error, want => %v got => %v", want, got)
+	}
+
+}
