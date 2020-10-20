@@ -238,22 +238,22 @@ func BenchmarkSumPayment_z(b *testing.B) {
 		b.Errorf("not nil error, account => %v", account)
 	}
 
-	err = s.Deposit(account.ID, 100_00)
+	err = s.Deposit(account.ID, 1000_00)
 	if err != nil {
 		b.Errorf("not nil error, error => %v", err)
 	}
 
-	_, err = s.Pay(account.ID, 1, "Cafe")
-	_, err = s.Pay(account.ID, 2, "Cafe")
-	_, err = s.Pay(account.ID, 3, "Cafe")
-	_, err = s.Pay(account.ID, 4, "Cafe")
-	_, err = s.Pay(account.ID, 5, "Cafe")
-	_, err = s.Pay(account.ID, 6, "Cafe")
-	_, err = s.Pay(account.ID, 7, "Cafe")
-	_, err = s.Pay(account.ID, 8, "Cafe")
-	_, err = s.Pay(account.ID, 9, "Cafe")
-	_, err = s.Pay(account.ID, 10, "Cafe")
-	_, err = s.Pay(account.ID, 11, "Cafe")
+	_, err = s.Pay(account.ID, 1, "Shop")
+	_, err = s.Pay(account.ID, 2, "Shop")
+	_, err = s.Pay(account.ID, 3, "Shop")
+	_, err = s.Pay(account.ID, 4, "Shop")
+	_, err = s.Pay(account.ID, 5, "Shop")
+	_, err = s.Pay(account.ID, 6, "Shop")
+	_, err = s.Pay(account.ID, 7, "Shop")
+	_, err = s.Pay(account.ID, 8, "Shop")
+	_, err = s.Pay(account.ID, 9, "Shop")
+	_, err = s.Pay(account.ID, 10, "Shop")
+	_, err = s.Pay(account.ID, 11, "Shop")
 	if err != nil {
 		b.Errorf("not nil error, err => %v", err)
 	}
