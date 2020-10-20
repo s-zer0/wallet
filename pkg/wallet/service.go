@@ -365,11 +365,11 @@ func (s *Service) Import(dir string) error {
 			return err
 		}
 
-		strArray := strings.Split(string(content), "\n")
-		if len(strArray) > 0 {
-			strArray = strArray[:len(strArray)-1]
+		strArrray := strings.Split(string(content), "\n")
+		if len(strArrray) > 0 {
+			strArrray = strArrray[:len(strArrray)-1]
 		}
-		for _, v := range strArray {
+		for _, v := range strArrray {
 			strArrAcount := strings.Split(v, ";")
 			fmt.Println(strArrAcount)
 
@@ -400,19 +400,19 @@ func (s *Service) Import(dir string) error {
 		}
 	}
 
-	_, err1 := os.Stat(dir + "/payments.dump")
+	_, err123 := os.Stat(dir + "/payments.dump")
 
-	if err1 == nil {
+	if err123 == nil {
 		content, err := ioutil.ReadFile(dir + "/payments.dump")
 		if err != nil {
 			return err
 		}
 
-		strArray := strings.Split(string(content), "\n")
-		if len(strArray) > 0 {
-			strArray = strArray[:len(strArray)-1]
+		strArrray := strings.Split(string(content), "\n")
+		if len(strArrray) > 0 {
+			strArrray = strArrray[:len(strArrray)-1]
 		}
-		for _, v := range strArray {
+		for _, v := range strArrray {
 			strArrAcount := strings.Split(v, ";")
 			fmt.Println(strArrAcount)
 
@@ -420,7 +420,7 @@ func (s *Service) Import(dir string) error {
 			if err != nil {
 				return err
 			}
-			aid, err := strconv.ParseInt(strArrAcount[1], 10, 64)
+			zid, err := strconv.ParseInt(strArrAcount[1], 10, 64)
 			if err != nil {
 				return err
 			}
@@ -431,7 +431,7 @@ func (s *Service) Import(dir string) error {
 			flag := true
 			for _, v := range s.payments {
 				if v.ID == id {
-					v.AccountID = aid
+					v.AccountID = zid
 					v.Amount = types.Money(amount)
 					v.Category = types.PaymentCategory(strArrAcount[3])
 					v.Status = types.PaymentStatus(strArrAcount[4])
@@ -441,7 +441,7 @@ func (s *Service) Import(dir string) error {
 			if flag {
 				data := &types.Payment{
 					ID:        id,
-					AccountID: aid,
+					AccountID: zid,
 					Amount:    types.Money(amount),
 					Category:  types.PaymentCategory(strArrAcount[3]),
 					Status:    types.PaymentStatus(strArrAcount[4]),
@@ -480,11 +480,11 @@ func (s *Service) Import(dir string) error {
 				return err
 			}
 			flag := true
-			for _, v := range s.favorites {
-				if v.ID == id {
-					v.AccountID = aid
-					v.Amount = types.Money(amount)
-					v.Category = types.PaymentCategory(strArrAcount[3])
+			for _, f := range s.favorites {
+				if f.ID == id {
+					f.AccountID = aid
+					f.Amount = types.Money(amount)
+					f.Category = types.PaymentCategory(strArrAcount[3])
 					flag = false
 				}
 			}
@@ -503,63 +503,6 @@ func (s *Service) Import(dir string) error {
 	return nil
 }
 
-func (s *Service) ExportAccountHistory(accountID int64) ([]types.Payment, error) {
-	zacc, err := s.FindAccountByID(accountID)
-	if err != nil {
-		return nil, err
-	}
-
-	var payments []types.Payment
-
-	for _, pay := range s.payments {
-		if pay.AccountID == zacc.ID {
-			data := types.Payment{
-				ID:        pay.ID,
-				AccountID: pay.AccountID,
-				Amount:    pay.Amount,
-				Category:  pay.Category,
-				Status:    pay.Status,
-			}
-			payments = append(payments, data)
-		}
-	}
-	return payments, nil
-}
-
-
-func (s *Service) HistoryToFiles(payments []types.Payment, dir string, records int) error {
-
-	data := ""
-
-	if len(payments) > 0 && len(payments) <= records {
-		file, _ := os.OpenFile(dir+"/payments.dump", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
-		defer file.Close()
-
-		for _, p := range payments {
-			data += fmt.Sprint(p.ID) + ";" + fmt.Sprint(p.AccountID) + ";" + fmt.Sprint(p.Amount) + ";" + fmt.Sprint(p.Category) + ";" + fmt.Sprint(p.Status) + "\n"
-		}
-		file.WriteString(data)
-	} else {
-		k := 0
-		t := 1
-		var file *os.File
-		for _, z := range payments {
-			if k == 0 {
-				file, _ = os.OpenFile(dir+"/payments"+fmt.Sprint(t)+".dump", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
-			}
-			k++
-			data = fmt.Sprint(z.ID) + ";" + fmt.Sprint(z.AccountID) + ";" + fmt.Sprint(z.Amount) + ";" + fmt.Sprint(z.Category) + ";" + fmt.Sprint(z.Status) + "\n"
-			_, _ = file.WriteString(data)
-			if k == records { 
-				data = ""
-				t++
-				k = 0
-				file.Close()
-			}
-		}
-	}
-	return nil
-}
 func (s *Service) SumPayments(goroutines int) types.Money {
 	zwg := sync.WaitGroup{}
 	zmu := sync.Mutex{}
@@ -602,3 +545,62 @@ func (s *Service) SumPayments(goroutines int) types.Money {
 	zwg.Wait()
 	return types.Money(sum)
 }
+
+func (s *Service) HistoryToFiles(payments []types.Payment, dir string, records int) error {
+
+	data := ""
+
+	if len(payments) > 0 && len(payments) <= records {
+		file, _ := os.OpenFile(dir+"/payments.dump", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+		defer file.Close()
+
+		for _, p := range payments {
+			data += fmt.Sprint(p.ID) + ";" + fmt.Sprint(p.AccountID) + ";" + fmt.Sprint(p.Amount) + ";" + fmt.Sprint(p.Category) + ";" + fmt.Sprint(p.Status) + "\n"
+		}
+		file.WriteString(data)
+	} else {
+		k := 0
+		t := 1
+		var file *os.File
+		for _, z := range payments {
+			if k == 0 {
+				file, _ = os.OpenFile(dir+"/payments"+fmt.Sprint(t)+".dump", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+			}
+			k++
+			data = fmt.Sprint(z.ID) + ";" + fmt.Sprint(z.AccountID) + ";" + fmt.Sprint(z.Amount) + ";" + fmt.Sprint(z.Category) + ";" + fmt.Sprint(z.Status) + "\n"
+			_, _ = file.WriteString(data)
+			if k == records { 
+				data = ""
+				t++
+				k = 0
+				file.Close()
+			}
+		}
+	}
+	return nil
+}
+
+func (s *Service) ExportAccountHistory(accountID int64) ([]types.Payment, error) {
+	zacc, err := s.FindAccountByID(accountID)
+	if err != nil {
+		return nil, err
+	}
+
+	var payments []types.Payment
+
+	for _, pay := range s.payments {
+		if pay.AccountID == zacc.ID {
+			data := types.Payment{
+				ID:        pay.ID,
+				AccountID: pay.AccountID,
+				Amount:    pay.Amount,
+				Category:  pay.Category,
+				Status:    pay.Status,
+			}
+			payments = append(payments, data)
+		}
+	}
+	return payments, nil
+}
+
+
