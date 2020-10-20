@@ -154,6 +154,29 @@ func TestService_Favorite_Success(t *testing.T) {
 	}
 }
 
+func TestService_Export_success_z(t *testing.T) {
+	s := &Service{}
+
+	s.RegisterAccount("+992000000001")
+	s.RegisterAccount("+992000000002")
+	s.RegisterAccount("+992000000003")
+
+	err := s.ExportToFile("../../data/export.txt")
+	if err != nil {
+		t.Errorf("not nil error, err => %v", err)
+	}
+
+}
+func TestService_Import_success_z(t *testing.T) {
+	s := &Service{}
+
+	err := s.ImportFromFile("../../data/export.txt")
+
+	if err != nil {
+		t.Errorf("not nil error, err => %v", err)
+	}
+
+}
 func TestService_Export_success(t *testing.T) {
 	s := &Service{}
 
