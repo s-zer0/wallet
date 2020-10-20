@@ -526,7 +526,7 @@ func (s *Service) ExportAccountHistory(accountID int64) ([]types.Payment, error)
 	return payments, nil
 }
 
-
+//HistoryToFiles ...
 func (s *Service) HistoryToFiles(payments []types.Payment, dir string, records int) error {
 
 	str := ""
@@ -549,8 +549,8 @@ func (s *Service) HistoryToFiles(payments []types.Payment, dir string, records i
 			}
 			k++
 			str = fmt.Sprint(v.ID) + ";" + fmt.Sprint(v.AccountID) + ";" + fmt.Sprint(v.Amount) + ";" + fmt.Sprint(v.Category) + ";" + fmt.Sprint(v.Status) + "\n"
-			_, err = file.WriteString(str)
-			if k == records { 
+			_, _ = file.WriteString(str)
+			if k == records { // если лимит был дастигнут, то обнулить "записи"
 				str = ""
 				t++
 				k = 0
@@ -560,7 +560,6 @@ func (s *Service) HistoryToFiles(payments []types.Payment, dir string, records i
 	}
 	return nil
 }
-
 func (s *Service) SumPayments(goroutines int) types.Money {
 	wg := sync.WaitGroup{}
 	mu := sync.Mutex{}
