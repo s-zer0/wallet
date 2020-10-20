@@ -167,7 +167,7 @@ func TestService_Export_success_z(t *testing.T) {
 	}
 
 }
-func TestService_Import_success_z(t *testing.T) {
+func TestService_Import_Success_z(t *testing.T) {
 	s := &Service{}
 
 	err := s.ImportFromFile("../../data/export.txt")
@@ -177,7 +177,7 @@ func TestService_Import_success_z(t *testing.T) {
 	}
 
 }
-func TestService_Export_success(t *testing.T) {
+func TestService_Export_Success(t *testing.T) {
 	s := &Service{}
 
 	s.RegisterAccount("+992000000001")
@@ -197,7 +197,7 @@ func TestService_Export_success(t *testing.T) {
 
 }
 
-func TestService_ExportHistory_success_user(t *testing.T) {
+func TestService_ExportHistory_success_z(t *testing.T) {
 	s := &Service{}
 
 	acc, err := s.RegisterAccount("+992000000001")
