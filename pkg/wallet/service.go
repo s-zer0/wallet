@@ -504,7 +504,7 @@ func (s *Service) Import(dir string) error {
 }
 
 func (s *Service) ExportAccountHistory(accountID int64) ([]types.Payment, error) {
-	acc, err := s.FindAccountByID(accountID)
+	zacc, err := s.FindAccountByID(accountID)
 	if err != nil {
 		return nil, err
 	}
@@ -512,7 +512,7 @@ func (s *Service) ExportAccountHistory(accountID int64) ([]types.Payment, error)
 	var payments []types.Payment
 
 	for _, pay := range s.payments {
-		if pay.AccountID == acc.ID {
+		if pay.AccountID == zacc.ID {
 			data := types.Payment{
 				ID:        pay.ID,
 				AccountID: pay.AccountID,
@@ -526,32 +526,32 @@ func (s *Service) ExportAccountHistory(accountID int64) ([]types.Payment, error)
 	return payments, nil
 }
 
-//HistoryToFiles ...
+
 func (s *Service) HistoryToFiles(payments []types.Payment, dir string, records int) error {
 
-	str := ""
+	data := ""
 
 	if len(payments) > 0 && len(payments) <= records {
 		file, _ := os.OpenFile(dir+"/payments.dump", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
 		defer file.Close()
 
-		for _, v := range payments {
-			str += fmt.Sprint(v.ID) + ";" + fmt.Sprint(v.AccountID) + ";" + fmt.Sprint(v.Amount) + ";" + fmt.Sprint(v.Category) + ";" + fmt.Sprint(v.Status) + "\n"
+		for _, p := range payments {
+			data += fmt.Sprint(p.ID) + ";" + fmt.Sprint(p.AccountID) + ";" + fmt.Sprint(p.Amount) + ";" + fmt.Sprint(p.Category) + ";" + fmt.Sprint(p.Status) + "\n"
 		}
-		file.WriteString(str)
+		file.WriteString(data)
 	} else {
-		k := 0 // limit on record
-		t := 1 // count for files
+		k := 0
+		t := 1
 		var file *os.File
-		for _, v := range payments {
+		for _, z := range payments {
 			if k == 0 {
 				file, _ = os.OpenFile(dir+"/payments"+fmt.Sprint(t)+".dump", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
 			}
 			k++
-			str = fmt.Sprint(v.ID) + ";" + fmt.Sprint(v.AccountID) + ";" + fmt.Sprint(v.Amount) + ";" + fmt.Sprint(v.Category) + ";" + fmt.Sprint(v.Status) + "\n"
-			_, _ = file.WriteString(str)
-			if k == records { // если лимит был дастигнут, то обнулить "записи"
-				str = ""
+			data = fmt.Sprint(z.ID) + ";" + fmt.Sprint(z.AccountID) + ";" + fmt.Sprint(z.Amount) + ";" + fmt.Sprint(z.Category) + ";" + fmt.Sprint(z.Status) + "\n"
+			_, _ = file.WriteString(data)
+			if k == records { 
+				data = ""
 				t++
 				k = 0
 				file.Close()
@@ -561,44 +561,44 @@ func (s *Service) HistoryToFiles(payments []types.Payment, dir string, records i
 	return nil
 }
 func (s *Service) SumPayments(goroutines int) types.Money {
-	wg := sync.WaitGroup{}
-	mu := sync.Mutex{}
+	zwg := sync.WaitGroup{}
+	zmu := sync.Mutex{}
 	sum := int64(0)
-	kol := 0
+	zkol := 0
 	i := 0
 	if goroutines == 0 {
-		kol = len(s.payments)
+		zkol = len(s.payments)
 	} else {
-		kol = int(len(s.payments) / goroutines)
+		zkol = int(len(s.payments) / goroutines)
 	}
 	for i = 0; i < goroutines-1; i++ {
-		wg.Add(1)
+		zwg.Add(1)
 		go func(index int) {
-			defer wg.Done()
+			defer zwg.Done()
 			val := int64(0)
-			payments := s.payments[index*kol : (index+1)*kol]
+			payments := s.payments[index*zkol : (index+1)*zkol]
 			for _, payment := range payments {
 				val += int64(payment.Amount)
 			}
-			mu.Lock()
+			zmu.Lock()
 			sum += val
-			mu.Unlock()
+			zmu.Unlock()
 
 		}(i)
 	}
-	wg.Add(1)
+	zwg.Add(1)
 	go func() {
-		defer wg.Done()
+		defer zwg.Done()
 		val := int64(0)
-		payments := s.payments[i*kol:]
-		for _, payment := range payments {
-			val += int64(payment.Amount)
+		payments := s.payments[i*zkol:]
+		for _, pay := range payments {
+			val += int64(pay.Amount)
 		}
-		mu.Lock()
+		zmu.Lock()
 		sum += val
-		mu.Unlock()
+		zmu.Unlock()
 
 	}()
-	wg.Wait()
+	zwg.Wait()
 	return types.Money(sum)
 }
